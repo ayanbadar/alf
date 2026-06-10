@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { ROUTES } from "@/constants";
 
 const fields = [
-  { key: "organization_name" as const, label: "Agency name", type: "text", required: true },
-  { key: "full_name" as const, label: "Your name", type: "text", required: false },
-  { key: "email" as const, label: "Email", type: "email", required: true },
-  { key: "password" as const, label: "Password", type: "password", required: true },
+  { key: "organization_name" as const, label: "Agency name", type: "text", required: true, placeholder: "Enter Agency Name" },
+  { key: "full_name" as const, label: "Your name", type: "text", required: false, placeholder: "Enter your Name" },
+  { key: "email" as const, label: "Email", type: "email", required: true, placeholder: "Enter your Email" },
+  { key: "password" as const, label: "Password", type: "password", required: true, placeholder: "Enter your Password" },
 ];
 
 export default function RegisterPage() {
@@ -51,33 +52,33 @@ export default function RegisterPage() {
         title="Create agency account"
         description="Urdu & English WhatsApp replies powered by your knowledge base"
         footer={
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
-            >
-              Sign in
-            </Link>
-          </p>
+          <div className="mt-6 border-t border-white/[0.07] pt-4 text-center text-[12px] text-muted-foreground">
+            Already have an account? {" "}
+            <Button asChild className="font-medium! text-brand hover:underline bg-transparent! p-0 m-0 text-[12px]">
+              <Link to={ROUTES.login}>
+                Sign in
+              </Link>
+            </Button>
+          </div>
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          {fields.map(({ key, label, type, required }) => (
-            <div key={key} className="space-y-2">
-              <Label htmlFor={key}>{label}</Label>
+          {fields.map(({ key, label, type, required, placeholder }) => (
+            <div key={key} className="grid gap-1.5">
+              <Label className="text-[12px]" htmlFor={key}>{label}</Label>
               <Input
                 id={key}
+                placeholder={placeholder}
                 type={type}
                 value={form[key]}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 required={required}
-                className="h-10 bg-background/50"
+                className="border-white/[0.07] bg-background"
                 autoComplete={
                   key === "password"
                     ? "new-password"
@@ -90,8 +91,7 @@ export default function RegisterPage() {
           ))}
           <Button
             type="submit"
-            size="lg"
-            className="mt-2 h-11 w-full rounded-md text-sm font-semibold shadow-md shadow-primary/15"
+            className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
             disabled={submitting}
           >
             {submitting ? "Creating account…" : "Create account"}

@@ -12,19 +12,19 @@ export function AuthCard({ title, description, children, footer, className }: Au
   return (
     <div
       className={cn(
-        "w-full overflow-hidden rounded-2xl border border-border/50 bg-card shadow-2xl shadow-black/40",
+        "rounded-2xl border border-white/[0.07] bg-card p-6 md:p-8",
         className
       )}
     >
-      <div className="border-b border-border/40 px-8 pt-8 pb-6">
-        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+      <div>
+        <h2 className="text-[18px] font-semibold">{title}</h2>
         {description && (
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">{description}</p>
         )}
       </div>
-      <div className="px-8 py-6">{children}</div>
+      <div className="px-0 py-0">{children}</div>
       {footer && (
-        <div className="border-t border-border/40 bg-muted/30 px-8 py-6">{footer}</div>
+        <div className="border-t border-border/40">{footer}</div>
       )}
     </div>
   );

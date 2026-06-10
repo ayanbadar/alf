@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { ROUTES } from "@/constants";
 
 export default function LoginPage() {
+  console.log('component is called');
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -19,7 +21,8 @@ export default function LoginPage() {
 
   if (user) return <Navigate to="/" replace />;
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: any) => {
+    console.log('submitted');
     e.preventDefault();
     setError("");
     setSubmitting(true);
@@ -40,15 +43,14 @@ export default function LoginPage() {
         title="Sign in"
         description="Access your agency dashboard"
         footer={
-          <p className="text-center text-sm text-muted-foreground">
+          <div className="mt-6 border-t border-white/[0.07] pt-4 text-center text-[12px] text-muted-foreground">
             No account?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
-            >
-              Create agency account
-            </Link>
-          </p>
+            <Button asChild className="font-medium! text-brand hover:underline bg-transparent! p-0 m-0 text-[12px] h-auto">
+              <Link to={ROUTES.register}>
+                Create agency account
+              </Link>
+            </Button>
+          </div>
         }
       >
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -57,40 +59,22 @@ export default function LoginPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@agency.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="h-10 bg-background/50"
-            />
+          <div className="mt-6 space-y-4">
+            <div className="grid gap-1.5">
+              <Label className="text-[12px]">Email</Label>
+              <Input onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email" className="border-white/[0.07] bg-background" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label className="text-[12px]">Password</Label>
+              <Input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter Password" className="border-white/[0.07] bg-background" />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
+            >
+              {submitting ? "Signing " : "Sign in"}
+            </Button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="h-10 bg-background/50"
-            />
-          </div>
-          <Button
-            type="submit"
-            size="lg"
-            className="mt-2 h-11 w-full rounded-md text-sm font-semibold shadow-md shadow-primary/15"
-            disabled={submitting}
-          >
-            {submitting ? "Signing in…" : "Sign in"}
-          </Button>
         </form>
       </AuthCard>
     </AuthLayout>
