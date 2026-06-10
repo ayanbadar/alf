@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import "./index.css";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
@@ -16,8 +17,10 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
-            <App />
-            <Toaster richColors position="top-right" />
+            <TooltipProvider>
+              <App />
+              <Toaster richColors position="top-right" />
+            </TooltipProvider>
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
