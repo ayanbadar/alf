@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/context/AuthContext";
 
 type NavItem = {
   title: string;
@@ -74,11 +75,11 @@ function NavGroup({ label, items, currentPath }: { label: string; items: NavItem
                   tooltip={item.title}
                   className={
                     active
-                      ? "bg-brand-muted text-brand hover:bg-brand-muted hover:text-brand"
-                      : "text-foreground/80 hover:bg-white/4 hover:text-foreground"
+                      ? "bg-brand-muted text-brand hover:bg-brand-muted hover:text-brand p-0"
+                      : "text-foreground/80 hover:bg-white/4 hover:text-foreground p-0"
                   }
                 >
-                  <Link to={item.url} className="flex items-center gap-2">
+                  <Link to={item.url} className="flex items-center gap-2 p-2 w-full h-full">
                     <item.icon className="h-4 w-4 shrink-0" />
                     <span className="text-[13px] leading-normal font-normal">{item.title}</span>
                     {item.badge && (
@@ -99,6 +100,7 @@ function NavGroup({ label, items, currentPath }: { label: string; items: NavItem
 
 export function AppSidebar() {
   const currentPath = useLocation().pathname;
+  const { user } = useAuth();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-white/[0.07] bg-sidebar">
@@ -123,11 +125,13 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-white/[0.07] p-3">
         <div className="flex items-center gap-3 px-1 py-2 group-data-[collapsible=icon]:hidden">
           <Avatar className="h-8 w-8 shrink-0">
-            <AvatarFallback className="bg-brand text-white text-[11px] font-medium">AR</AvatarFallback>
+            <AvatarFallback className="bg-brand text-white text-[11px] font-medium">
+              {`${user?.full_name.split(" ")[0].charAt(0)}${user?.full_name.split(" ")[1].charAt(0)}`}
+            </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium">Abdul Rehman S.</p>
-            <p className="truncate text-[11px] text-muted-foreground">Cartiqq</p>
+            <p className="truncate text-[13px] font-medium">{user?.full_name}</p>
+            <p className="truncate text-[11px] text-muted-foreground">{user?.organization_name}</p>
           </div>
         </div>
         <Separator className="my-1 bg-white/[0.07] group-data-[collapsible=icon]:hidden" />
