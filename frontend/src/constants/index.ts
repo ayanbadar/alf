@@ -1,10 +1,10 @@
-import { CalendarCheck, MessageSquare, Percent, UserPlus, Users } from "lucide-react";
+import { NavItem } from "@/types";
+import { BookOpen, Calendar, CalendarCheck, LayoutGrid, MessageCircle, MessageSquare, Percent, Plug, Settings, UserPlus, Users } from "lucide-react";
 
 export const ROUTES = {
     base: "/",
     login: "/login",
     register: "/register",
-
 };
 
 export const chartData = [
@@ -31,8 +31,20 @@ export const activity = [
 ];
 
 export const stats = [
-    { label: "Leads today", value: "12", delta: "+8%", up: true, icon: UserPlus },
-    { label: "Messages today", value: "247", delta: "+24%", up: true, icon: MessageSquare },
-    { label: "Appointments", value: "5", delta: "-1", up: false, icon: CalendarCheck },
-    { label: "Conversion rate", value: "18%", delta: "+3%", up: true, icon: Percent, format: (v: number) => `${v}%` },
+    { label: "Leads today", value: "12", delta: "+8%", up: true, icon: UserPlus, key: "leads_today" },
+    { label: "Messages today", value: "247", delta: "+24%", up: true, icon: MessageSquare, key: "messages_today" },
+    { label: "Appointments", value: "5", delta: "-1", up: false, icon: CalendarCheck, key: "appointments_today" },
+    { label: "Conversion rate", value: "18%", delta: "+3%", up: true, icon: Percent, key: "conversion_rate", format: (v: number) => `${v}%` },
 ];
+
+export const mainNav: NavItem[] = [
+    { title: "Overview", url: "/", icon: LayoutGrid },
+    { title: "Chats", url: "/chats", icon: MessageCircle, badge: "3" },
+    { title: "Leads", url: "/leads", icon: Users },
+    { title: "Appointments", url: "/appointments", icon: Calendar },
+    { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
+    { title: "Connection", url: "/connection", icon: Plug },
+    { title: "Settings", url: "/settings", icon: Settings },
+];
+
+export const BASE_URL = "/api/v1";

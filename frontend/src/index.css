@@ -196,12 +196,22 @@
 
 /* ── Utility: pulsing green dot for AI status ── */
 @keyframes brand-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(1.4); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
 }
 
 @utility pulse-dot {
   position: relative;
+
   &::after {
     content: "";
     position: absolute;
@@ -210,4 +220,16 @@
     background: var(--brand);
     animation: brand-pulse 2s ease-in-out infinite;
   }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0E1117 inset !important;
+  box-shadow: 0 0 0 1000px #0E1117 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  outline: none !important;
+  border: 1px solid var(--brand) !important;
 }

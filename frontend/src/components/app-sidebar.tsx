@@ -29,35 +29,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
-
-type NavItem = {
-  title: string;
-  url: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-};
-
-const mainNav: NavItem[] = [
-  { title: "Overview", url: "/", icon: LayoutGrid },
-  { title: "Chats", url: "/chats", icon: MessageCircle, badge: "3" },
-  { title: "Leads", url: "/leads", icon: Users },
-  { title: "Appointments", url: "/appointments", icon: Calendar },
-];
-
-const configureNav: NavItem[] = [
-  { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
-  { title: "AI Persona", url: "/persona", icon: Sparkles },
-  { title: "Quick Replies", url: "/quick-replies", icon: Zap },
-  { title: "Widget", url: "/widget", icon: Globe },
-];
-
-const accountNav: NavItem[] = [
-  { title: "Connection", url: "/connection", icon: Plug },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
+import { NavItem } from "@/types";
+import { mainNav } from "@/constants";
 
 function NavGroup({ label, items, currentPath }: { label: string; items: NavItem[]; currentPath: string }) {
   return (
@@ -100,7 +74,7 @@ function NavGroup({ label, items, currentPath }: { label: string; items: NavItem
 
 export function AppSidebar() {
   const currentPath = useLocation().pathname;
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-white/[0.07] bg-sidebar">
@@ -118,28 +92,27 @@ export function AppSidebar() {
 
       <SidebarContent className="gap-0 py-2">
         <NavGroup label="Main" items={mainNav} currentPath={currentPath} />
-        <NavGroup label="Configure" items={configureNav} currentPath={currentPath} />
-        <NavGroup label="Account" items={accountNav} currentPath={currentPath} />
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/[0.07] p-3">
+      <SidebarFooter className="border-t border-white/[0.07] p-3 gap-0">
         <div className="flex items-center gap-3 px-1 py-2 group-data-[collapsible=icon]:hidden">
           <Avatar className="h-8 w-8 shrink-0">
-            <AvatarFallback className="bg-brand text-white text-[11px] font-medium">
-              {`${user?.full_name.split(" ")[0].charAt(0)}${user?.full_name.split(" ")[1].charAt(0)}`}
-            </AvatarFallback>
+            {Boolean(user?.full_name) && (<AvatarFallback className="bg-brand text-white text-[11px] font-medium">
+              {`${user?.full_name?.split(" ")?.[0]?.charAt(0) || ""}${user?.full_name?.split(" ")?.[1]?.charAt(0) || ""}`}
+            </AvatarFallback>)}
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-medium">{user?.full_name}</p>
             <p className="truncate text-[11px] text-muted-foreground">{user?.organization_name}</p>
           </div>
         </div>
-        <Separator className="my-1 bg-white/[0.07] group-data-[collapsible=icon]:hidden" />
+        {/* <Separator className="my-1 bg-white/[0.07] group-data-[collapsible=icon]:hidden" /> */}
         <Button
           variant="ghost"
           size="sm"
           className="justify-start gap-2 text-[13px] py-4 text-muted-foreground hover:text-foreground hover:bg-white/4"
           asChild
+          onClick={logout}
         >
           <LogOut className="h-4 w-4" />
           <span className="group-data-[collapsible=icon]:hidden">Sign out</span>
@@ -151,11 +124,10 @@ export function AppSidebar() {
 
 export function MobileBottomNav() {
   const currentPath = useLocation().pathname;
-  const items = mainNav.concat([accountNav[2]]);
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.07] bg-sidebar md:hidden">
       <ul className="grid grid-cols-5">
-        {items.map((item) => {
+        {mainNav.map((item) => {
           const active = currentPath === item.url;
           return (
             <li key={item.url}>

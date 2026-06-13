@@ -1,5 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Building2, User } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
@@ -17,6 +16,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { useUpdateUser } from "@/api/auth/auth-api";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema, ProfileSchemaType } from "@/schema/profile";
+import FieldWrapper from "@/components/field-wrapper";
 
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
@@ -28,26 +32,25 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
 }
 
 export default function SettingsPage() {
-  const { user, updateProfile } = useAuth();
-  const [fullName, setFullName] = useState(user?.full_name ?? "");
-
-  useEffect(() => {
-    setFullName(user?.full_name ?? "");
-  }, [user?.full_name]);
-
-  const saveProfile = useMutation({
-    mutationFn: () => updateProfile(fullName.trim()),
-    onSuccess: () => toast.success("Profile updated"),
-    onError: () => toast.error("Failed to update profile"),
+  const { user } = useAuth();
+  const methods = useForm<ProfileSchemaType>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { fullName: user?.full_name ?? "" }
   });
 
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!fullName.trim()) {
-      toast.error("Name cannot be empty");
-      return;
-    }
-    saveProfile.mutate();
+  const fullName = methods.watch("fullName") ?? "";
+
+  const { handleSubmit, register, formState } = methods;
+
+  const { mutateAsync: handleUpdateUserAsync, isSuccess: userUpdatedSuccess, isPending: userUpdatePending } = useUpdateUser();
+
+  if (userUpdatedSuccess) {
+    toast.success("Full Name Updated Successfully");
+  };
+
+  const onSubmit = async (data: ProfileSchemaType) => {
+    const { fullName } = data;
+    await handleUpdateUserAsync({ fullName });
   };
 
   if (!user) return null;
@@ -58,7 +61,6 @@ export default function SettingsPage() {
         title="Settings"
         description="Your profile, agency details, and app preferences."
       />
-
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -67,39 +69,40 @@ export default function SettingsPage() {
           </div>
           <CardDescription>Update how your name appears in the dashboard.</CardDescription>
         </CardHeader>
-        <form onSubmit={onSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="full_name">Display name</Label>
-              <Input
-                id="full_name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Your name"
-                required
-              />
-            </div>
-            <ReadOnlyField label="Email" value={user.email} />
-            <div className="space-y-2">
-              <Label>Role</Label>
-              <div>
-                <Badge variant="secondary" className="capitalize">
-                  {user.role}
-                </Badge>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              <FieldWrapper name="fullName">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Display name</Label>
+                  <Input
+                    {...register("fullName")}
+                    id="full_name"
+                    placeholder="Your name"
+                    value={fullName}
+                  />
+                </div>
+              </FieldWrapper>
+              <ReadOnlyField label="Email" value={user.email} />
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <div>
+                  <Badge variant="secondary" className="capitalize">
+                    {user.role}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              type="submit"
-              disabled={
-                saveProfile.isPending || fullName.trim() === user.full_name
-              }
-            >
-              {saveProfile.isPending ? "Saving…" : "Save profile"}
-            </Button>
-          </CardFooter>
-        </form>
+            </CardContent>
+            <CardFooter>
+              <Button
+                type="submit"
+                disabled={userUpdatePending || formState?.fullName?.trim() === user.full_name}
+              >
+                {userUpdatePending ? "Saving…" : "Save profile"}
+              </Button>
+            </CardFooter>
+          </form>
+        </FormProvider>
       </Card>
 
       <Card>

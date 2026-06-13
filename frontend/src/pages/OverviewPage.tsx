@@ -1,16 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  CalendarCheck,
-  MessageSquare,
-  Percent,
-  UserPlus,
-  Users,
-} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/api/client";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
@@ -19,14 +11,7 @@ import { activity, chartData, replyMix, stats } from "@/constants";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Separator } from "@base-ui/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface Stats {
-  leads_today: number;
-  messages_today: number;
-  appointments_today: number;
-  total_leads: number;
-  conversion_rate: number;
-}
+import { Stats } from "@/types/dashboard";
 
 export default function OverviewPage() {
   const [aiOn, setAiOn] = useState<boolean>(true);
@@ -43,7 +28,6 @@ export default function OverviewPage() {
         description="Today's activity across WhatsApp conversations, leads, and site visits."
         action={<Badge variant="muted" className="hidden sm:inline-flex">Today - Pakistan</Badge>}
       />
-
       <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.07] bg-card px-4 py-3">
         <span className="pulse-dot relative h-2 w-2 rounded-full bg-brand" />
         <p className="text-[13px]">
@@ -70,7 +54,7 @@ export default function OverviewPage() {
           ))
           : stats.map((stat) => {
             const Icon = stat.icon;
-            const raw = data?.[stat.key] ?? 0;
+            const raw = data?.[stat.key as keyof Stats] ?? 0;
             const value = stat.format ? stat.format(raw as number) : raw;
             return <StatCard Icon={Icon} key={stat.label} label={stat.label} stat={stat} value={value} />
           })}

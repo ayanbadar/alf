@@ -1,48 +1,37 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth-card";
 import { AuthLayout } from "@/components/auth-layout";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { ROUTES } from "@/constants";
-
-const fields = [
-  { key: "organization_name" as const, label: "Agency name", type: "text", required: true, placeholder: "Enter Agency Name" },
-  { key: "full_name" as const, label: "Your name", type: "text", required: false, placeholder: "Enter your Name" },
-  { key: "email" as const, label: "Email", type: "email", required: true, placeholder: "Enter your Email" },
-  { key: "password" as const, label: "Password", type: "password", required: true, placeholder: "Enter your Password" },
-];
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignUpInput, signUpSchema } from "@/schema/register";
+import FieldWrapper from "@/components/field-wrapper";
 
 export default function RegisterPage() {
-  const { register, user } = useAuth();
+  const { register: handleRegisterForm, token, registerPending } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    organization_name: "",
-    email: "",
-    password: "",
-    full_name: "",
+
+  const methods = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema)
   });
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  const { handleSubmit, register } = methods;
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSubmitting(true);
+  if (token) return <Navigate to="/" replace />;
+
+  const onSubmit = async (data: SignUpInput) => {
     try {
-      await register(form);
+      await handleRegisterForm(data);
       toast.success("Account created — connect WhatsApp next");
       navigate("/connection");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
-    } finally {
-      setSubmitting(false);
+      toast.error("Account Register Failed");
     }
   };
 
@@ -62,41 +51,65 @@ export default function RegisterPage() {
           </div>
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {fields.map(({ key, label, type, required, placeholder }) => (
-            <div key={key} className="grid gap-1.5">
-              <Label className="text-[12px]" htmlFor={key}>{label}</Label>
-              <Input
-                id={key}
-                placeholder={placeholder}
-                type={type}
-                value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                required={required}
-                className="border-white/[0.07] bg-background"
-                autoComplete={
-                  key === "password"
-                    ? "new-password"
-                    : key === "email"
-                      ? "email"
-                      : undefined
-                }
-              />
-            </div>
-          ))}
-          <Button
-            type="submit"
-            className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
-            disabled={submitting}
-          >
-            {submitting ? "Creating account…" : "Create account"}
-          </Button>
-        </form>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-6">
+            <FieldWrapper name="organization_name">
+              <div className="grid gap-1.5">
+                <Label className="text-[12px]" htmlFor="agency-name">Agency name</Label>
+                <Input
+                  {...register("organization_name")}
+                  id="agency-name"
+                  placeholder="Enter Agency Name"
+                  type="text"
+                  className="border-white/[0.07] bg-background"
+                />
+              </div>
+            </FieldWrapper>
+            <FieldWrapper name="name">
+              <div className="grid gap-1.5">
+                <Label className="text-[12px]" htmlFor="name">Name</Label>
+                <Input
+                  {...register("name")}
+                  id="agency-name"
+                  placeholder="Enter Your Name"
+                  type="text"
+                  className="border-white/[0.07] bg-background"
+                />
+              </div>
+            </FieldWrapper>
+            <FieldWrapper name="email">
+              <div className="grid gap-1.5">
+                <Label className="text-[12px]" htmlFor="email">Email</Label>
+                <Input
+                  {...register("email")}
+                  id="email"
+                  placeholder="Enter Your Email"
+                  type="text"
+                  className="border-white/[0.07] bg-background"
+                />
+              </div>
+            </FieldWrapper>
+            <FieldWrapper name="password">
+              <div className="grid gap-1.5">
+                <Label className="text-[12px]" htmlFor="email">Password</Label>
+                <Input
+                  {...register("password")}
+                  id="email"
+                  placeholder="Enter Password"
+                  type="text"
+                  className="border-white/[0.07] bg-background"
+                />
+              </div>
+            </FieldWrapper>
+            <Button
+              type="submit"
+              className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
+              disabled={registerPending}
+            >
+              {registerPending ? "Creating account…" : "Create account"}
+            </Button>
+          </form>
+        </FormProvider>
       </AuthCard>
     </AuthLayout>
   );

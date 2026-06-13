@@ -1,39 +1,39 @@
-import { FormEvent, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth-card";
 import { AuthLayout } from "@/components/auth-layout";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { ROUTES } from "@/constants";
+import { FormProvider, useForm } from "react-hook-form";
+import { SignInInput, signInSchema } from "@/schema/login";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FieldWrapper from "@/components/field-wrapper";
 
 export default function LoginPage() {
-  console.log('component is called');
-  const { login, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { login, token, loginSuccess, loginPending } = useAuth();
 
-  if (user) return <Navigate to="/" replace />;
+  const methods = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+  });
 
-  const handleSubmit = async (e: any) => {
-    console.log('submitted');
-    e.preventDefault();
-    setError("");
-    setSubmitting(true);
+  const { handleSubmit, register } = methods;
+
+  if (token) return <Navigate to="/" replace />;
+
+  const onSubmit = async (data: SignInInput) => {
+    const { email, password } = data;
     try {
       await login(email, password);
-      toast.success("Welcome back");
+      if (loginSuccess) {
+        toast.success("Welcome back");
+      }
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
-      setSubmitting(false);
+      toast.error("Login Failed");
     }
   };
 
@@ -53,29 +53,30 @@ export default function LoginPage() {
           </div>
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <div className="mt-6 space-y-4">
-            <div className="grid gap-1.5">
-              <Label className="text-[12px]">Email</Label>
-              <Input onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email" className="border-white/[0.07] bg-background" />
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="mt-6 space-y-4">
+              <FieldWrapper name="email">
+                <div className="grid gap-1.5">
+                  <Label className="text-[12px]">Email</Label>
+                  <Input {...register("email")} placeholder="Enter your Email" className="border-white/[0.07] bg-background" />
+                </div>
+              </FieldWrapper>
+              <FieldWrapper name="password">
+                <div className="grid gap-1.5">
+                  <Label className="text-[12px]">Password</Label>
+                  <Input {...register("password")} type="password" placeholder="Enter Password" className="border-white/[0.07] bg-background" />
+                </div>
+              </FieldWrapper>
+              <Button
+                type="submit"
+                className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
+              >
+                {loginPending ? "Signing " : "Sign in"}
+              </Button>
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-[12px]">Password</Label>
-              <Input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter Password" className="border-white/[0.07] bg-background" />
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-brand text-primary-foreground hover:bg-brand/90"
-            >
-              {submitting ? "Signing " : "Sign in"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
       </AuthCard>
     </AuthLayout>
   );
