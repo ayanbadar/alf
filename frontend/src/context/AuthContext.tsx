@@ -1,22 +1,17 @@
 import {
   createContext,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { api } from "../api/client";
-import { AuthContextValue, RegisterPayload, User } from "@/types/auth";
-import { useLogin, useMe, useRegister, useUpdateUser } from "@/api/auth/auth-api";
-import { redirect } from "react-router-dom";
-import { ROUTES } from "@/constants";
+import { AuthContextValue, RegisterPayload } from "@/types/auth";
+import { useLogin, useMe, useRegister } from "@/api/auth/auth-api";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string>("");
+  const [token, setToken] = useState<string>(localStorage.getItem("access_token") || "");
   const { data: user, isLoading: loading, refetch: refetchUser } = useMe();
   const { mutateAsync: handleLoginAsync, isSuccess: loginSuccess, isPending: loginPending } = useLogin();
   const { mutateAsync: handleRegisterAsync, isSuccess: registerSuccess, isPending: registerPending } = useRegister();
@@ -42,12 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refetchUser();
   };
 
-  const updateProfile = useCallback(async (fullName: string) => {
-    await handleUpdateUserAsync(fullName)
-    refetchUser();
-    // setUser(updated);
-  }, []);
-
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
@@ -55,15 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, loading, login, register, updateProfile, logout, loginSuccess, registerSuccess, token, loginPending, registerPending }),
-    [user, loading, login, register, updateProfile, logout, loginSuccess, registerSuccess, token,
+    () => ({ user, loading, login, register, logout, loginSuccess, registerSuccess, token, loginPending, registerPending }),
+    [user, loading, login, register, logout, loginSuccess, registerSuccess, token,
       loginPending, registerPending
     ]
   );
-
-  useEffect(() => {
-    if (!token) redirect(ROUTES.login);
-  }, [token]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

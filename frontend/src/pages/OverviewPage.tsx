@@ -12,14 +12,12 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveCo
 import { Separator } from "@base-ui/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Stats } from "@/types/dashboard";
+import { useGetStats } from "@/api/dashboard/dashboard-api";
 
 export default function OverviewPage() {
   const [aiOn, setAiOn] = useState<boolean>(true);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard-stats"],
-    queryFn: () => api<Stats>("/dashboard/stats"),
-  });
+  const { data: statsData, isLoading: statsLoading } = useGetStats();
 
   return (
     <div>
@@ -41,7 +39,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {isLoading
+        {statsLoading
           ? Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <CardHeader className="pb-2">
@@ -54,7 +52,7 @@ export default function OverviewPage() {
           ))
           : stats.map((stat) => {
             const Icon = stat.icon;
-            const raw = data?.[stat.key as keyof Stats] ?? 0;
+            const raw = statsData?.[stat.key as keyof Stats] ?? 0;
             const value = stat.format ? stat.format(raw as number) : raw;
             return <StatCard Icon={Icon} key={stat.label} label={stat.label} stat={stat} value={value} />
           })}

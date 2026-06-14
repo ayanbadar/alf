@@ -8,7 +8,6 @@ export type AuthContextValue = {
         password: string;
         full_name?: string;
     }) => Promise<void>;
-    updateProfile: (fullName: string) => Promise<void>;
     logout: () => void;
     loginSuccess: boolean;
     registerSuccess: boolean;

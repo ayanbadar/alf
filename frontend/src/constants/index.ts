@@ -5,6 +5,12 @@ export const ROUTES = {
     base: "/",
     login: "/login",
     register: "/register",
+    chats: "/chats",
+    leads: "/leads",
+    appointments: "/appointments",
+    knowledge: "/knowledge",
+    connection: "/connection",
+    settings: "/settings",
 };
 
 export const chartData = [
@@ -38,13 +44,13 @@ export const stats = [
 ];
 
 export const mainNav: NavItem[] = [
-    { title: "Overview", url: "/", icon: LayoutGrid },
-    { title: "Chats", url: "/chats", icon: MessageCircle, badge: "3" },
-    { title: "Leads", url: "/leads", icon: Users },
-    { title: "Appointments", url: "/appointments", icon: Calendar },
-    { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
-    { title: "Connection", url: "/connection", icon: Plug },
-    { title: "Settings", url: "/settings", icon: Settings },
+    { title: "Overview", url: ROUTES.base, icon: LayoutGrid },
+    { title: "Chats", url: ROUTES.chats, icon: MessageCircle, badge: "3" },
+    { title: "Leads", url: ROUTES.leads, icon: Users },
+    { title: "Appointments", url: ROUTES.appointments, icon: Calendar },
+    { title: "Knowledge Base", url: ROUTES.knowledge, icon: BookOpen },
+    { title: "Connection", url: ROUTES.connection, icon: Plug },
+    { title: "Settings", url: ROUTES.settings, icon: Settings },
 ];
 
 export const BASE_URL = "/api/v1";

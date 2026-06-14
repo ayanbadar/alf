@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Building2, User } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
@@ -40,7 +39,7 @@ export default function SettingsPage() {
 
   const fullName = methods.watch("fullName") ?? "";
 
-  const { handleSubmit, register, formState } = methods;
+  const { handleSubmit, register } = methods;
 
   const { mutateAsync: handleUpdateUserAsync, isSuccess: userUpdatedSuccess, isPending: userUpdatePending } = useUpdateUser();
 
@@ -50,7 +49,7 @@ export default function SettingsPage() {
 
   const onSubmit = async (data: ProfileSchemaType) => {
     const { fullName } = data;
-    await handleUpdateUserAsync({ fullName });
+    await handleUpdateUserAsync({ full_name: fullName });
   };
 
   if (!user) return null;
@@ -96,7 +95,7 @@ export default function SettingsPage() {
             <CardFooter>
               <Button
                 type="submit"
-                disabled={userUpdatePending || formState?.fullName?.trim() === user.full_name}
+                disabled={userUpdatePending || fullName.trim() === user.full_name}
               >
                 {userUpdatePending ? "Saving…" : "Save profile"}
               </Button>

@@ -19,7 +19,7 @@ export class AuthService {
         return response.data;
     };
 
-    static async updateUser(payload: { fullName: string }) {
+    static async updateUser(payload: { full_name: string }) {
         const response = await api.patch(`${API_URL}/me`, payload);
         return response.data;
     };

@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   const { handleSubmit, register } = methods;
 
-  if (token) return <Navigate to="/" replace />;
+  if (token) return <Navigate to={ROUTES.base} replace />;
 
   const onSubmit = async (data: SignInInput) => {
     const { email, password } = data;
@@ -31,7 +31,7 @@ export default function LoginPage() {
       if (loginSuccess) {
         toast.success("Welcome back");
       }
-      navigate("/");
+      navigate(ROUTES.base);
     } catch (err) {
       toast.error("Login Failed");
     }

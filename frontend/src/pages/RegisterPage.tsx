@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth-card";
@@ -14,22 +13,23 @@ import { SignUpInput, signUpSchema } from "@/schema/register";
 import FieldWrapper from "@/components/field-wrapper";
 
 export default function RegisterPage() {
-  const { register: handleRegisterForm, token, registerPending } = useAuth();
   const navigate = useNavigate();
 
   const methods = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema)
   });
 
+  const { register: handleRegisterForm, token, registerPending } = useAuth();
+
   const { handleSubmit, register } = methods;
 
-  if (token) return <Navigate to="/" replace />;
+  if (token) return <Navigate to={ROUTES.base} replace />;
 
   const onSubmit = async (data: SignUpInput) => {
     try {
       await handleRegisterForm(data);
       toast.success("Account created — connect WhatsApp next");
-      navigate("/connection");
+      navigate(ROUTES.connection);
     } catch (err) {
       toast.error("Account Register Failed");
     }
