@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar, MobileBottomNav } from "@/components/app-sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarProvider } from "./ui/sidebar";
 
 export default function Layout() {
@@ -10,11 +9,9 @@ export default function Layout() {
         <AppSidebar />
         <MobileBottomNav />
       </SidebarProvider>
-      <ScrollArea className="flex-1">
-        <main className="ml-auto w-[80%] p-6 lg:p-8">
-          <Outlet />
-        </main>
-      </ScrollArea>
+      <main className="ml-auto w-[80%] p-6 lg:p-8">
+        <Outlet />
+      </main>
     </div>
   );
 }

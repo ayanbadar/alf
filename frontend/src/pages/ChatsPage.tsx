@@ -16,23 +16,8 @@ import { cn } from "@/lib/utils";
 import { useListPagination } from "@/hooks/use-list-pagination";
 import { api } from "@/api/client";
 import { type PaginatedResponse, paginatedUrl } from "@/lib/pagination";
-
-interface Conversation {
-  id: number;
-  contact_wa_id: string;
-  contact_name: string | null;
-  human_mode: boolean;
-  last_message_at: string | null;
-  last_message_preview: string | null;
-}
-
-interface Message {
-  id: number;
-  direction: string;
-  sender: string;
-  content: string;
-  created_at: string;
-}
+import { Message } from "react-hook-form";
+import { Conversation } from "@/types/chats";
 
 const senderStyles: Record<string, string> = {
   customer: "bg-muted mr-auto rounded-bl-sm",

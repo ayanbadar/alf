@@ -5,7 +5,7 @@ const API_URL = "/settings";
 
 export class ConnectionService {
     static async getWhatsappSettings(): Promise<WhatsAppSettings> {
-        const response = await api.get(`${API_URL}/whatsapp/`);
+        const response = await api.get(`${API_URL}/whatsapp`);
         return response.data;
     };
 
