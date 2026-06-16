@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { Calendar, MapPin, Phone } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { ListPagination } from "@/components/list-pagination";
@@ -7,35 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useListPagination } from "@/hooks/use-list-pagination";
-import { api } from "@/api/client";
-import { type PaginatedResponse, paginatedUrl } from "@/lib/pagination";
-
-interface Appointment {
-  id: number;
-  scheduled_at: string;
-  project: string | null;
-  notes: string | null;
-  status: string;
-  contact_phone: string | null;
-}
-
-const statusVariant: Record<string, "default" | "secondary" | "outline"> = {
-  scheduled: "default",
-  confirmed: "default",
-  completed: "secondary",
-  cancelled: "outline",
-};
+import { useGetAllAppointments } from "@/api/appointments/appointments-api";
+import { AppointmentStatus, statusVariant } from "@/types/appointments";
 
 export default function AppointmentsPage() {
   const { offset, setOffset } = useListPagination();
-  const { data, isLoading } = useQuery({
-    queryKey: ["appointments", offset],
-    queryFn: () =>
-      api<PaginatedResponse<Appointment>>(paginatedUrl("/appointments", offset)),
-  });
+  const { data: appointmentsData, isLoading: appointmentsLoading } = useGetAllAppointments(offset);
 
-  const appointments = data?.items ?? [];
-  const total = data?.total ?? 0;
+  const appointments = appointmentsData?.items ?? [];
+  const total = appointmentsData?.total ?? 0;
 
   return (
     <div>
@@ -44,7 +23,7 @@ export default function AppointmentsPage() {
         description="Site visits and meetings booked via WhatsApp (Pakistan timezone)."
       />
 
-      {isLoading ? (
+      {appointmentsLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full rounded-xl" />
@@ -91,7 +70,7 @@ export default function AppointmentsPage() {
                     )}
                   </div>
                   <Badge
-                    variant={statusVariant[a.status] ?? "secondary"}
+                    variant={statusVariant[a.status as AppointmentStatus] ?? "secondary"}
                     className="w-fit capitalize"
                   >
                     {a.status}
